@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}داشبورد ادمین{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-4 shadow-lg" style="background-color: #ffffffb3;">
+        <h2 class="mb-4 text-center">داشبورد مدیریت</h2>
+
+        <!-- دکمه افزودن خبر -->
+        <div class="mb-4 text-center">
+            <a href="{{ url_for("add_news")  }}" class="btn btn-success">افزودن خبر جدید</a>
+        </div>
+
+        <!-- لیست خبرها -->
+        <h4 class="mb-3">لیست خبرها</h4>
+
+        <table class="table table-striped table-hover text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>شناسه</th>
+                    <th>عنوان</th>
+                    <th>نویسنده</th>
+                    <th>تاریخ</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for news_item in news_list %}
+                <tr>
+                    <td>{{ news_item.id }}</td>
+                    <td>{{ news_item.title }}</td>
+                    <td>{{ news_item.author }}</td>
+                    <td>{{ news_item.date }}</td>
+                    <td>
+                        <form method="POST" action="#" onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید این خبر را حذف کنید؟');">
+                            <button type="submit" class="btn btn-danger btn-sm">حذف</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not news_list %}
+            <p class="text-center mt-4">هیچ خبری ثبت نشده است.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}ورود{% endblock %}
+
+{% block content %}
+     <style>
+    body {
+      background: linear-gradient(to left, #e0eafc, #cfdef3);
+      min-height: 100vh;
+        display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+    </style>
+  <div class="login-card">
+    <h4 class="text-center mb-4 text-primary">ورود به حساب کاربری</h4>
+
+
+    <form method="POST" class="form-register">
+            {{ form.hidden_tag() }}
+
+         <div class="mb-3">
+
+             {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", id="username", placeholder="نام") }}
+        </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">رمز عبور :</label>
+        {{ form.password(class="form-control", id="password", placeholder="*********") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.remember() }}
+        <label for="remember" class="form-check-label">مرا به خاطر بسپار</label>
+      </div>
+
+      {{ form.submit(class="form-control btn btn-lg btn-block btn-primary") }} <!-- Updated submit button -->
+
+      </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}افزودن خبر جدید{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card p-4 shadow-lg" style="background-color: #ffffffb3; max-width: 700px; margin: auto;">
+    <h2 class="mb-4 text-center">افزودن خبر جدید</h2>
+
+    <form method="POST" action="{{ url_for('add_news') }}">
+      {{ form.hidden_tag() }}
+      <!-- عنوان خبر -->
+      <div class="mb-3">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(class="form-control", placeholder="عنوان خبر را وارد کنید") }}
+        {% for error in form.title.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- نویسنده -->
+      <div class="mb-3">
+        {{ form.author.label(class="form-label") }}
+        {{ form.author(class="form-control", placeholder="نام نویسنده را وارد کنید") }}
+        {% for error in form.author.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+       <!-- خلاصه -->
+      <div class="mb-3">
+        {{ form.summary.label(class="form-label") }}
+        {{ form.summary(class="form-control", placeholder="نام نویسنده را وارد کنید") }}
+        {% for error in form.summary.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- لینک تصویر -->
+      <div class="mb-3">
+        {{ form.image_url.label(class="form-label") }}
+        {{ form.image_url(class="form-control", placeholder="لینک تصویر خبر را وارد کنید", oninput="previewImage(this.value)") }}
+        {% for error in form.image_url.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- پیش نمایش تصویر -->
+      <div id="image-preview" class="mb-4 text-center" style="display: none;">
+        <img id="preview-img" src="" class="img-fluid rounded shadow" style="max-height: 250px;">
+      </div>
+
+      <!-- متن خبر -->
+      <div class="mb-4">
+        {{ form.body.label(class="form-label") }}
+        {{ form.body(class="form-control", rows="6", placeholder="متن خبر را بنویسید") }}
+        {% for error in form.body.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- دکمه ثبت -->
+      <div class="d-grid">
+        {{ form.submit(class="btn btn-success btn-lg") }}
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function previewImage(url) {
+    const previewDiv = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+
+    if (url) {
+      previewImg.src = url;
+      previewDiv.style.display = 'block';
+    } else {
+      previewDiv.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}
