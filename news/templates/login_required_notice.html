@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}ورود لازم است{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card text-center shadow p-4" style="max-width: 500px; background-color: #ffffffc9;">
+    <div class="card-body">
+      <h3 class="card-title mb-3">دسترسی محدود</h3>
+      <p class="card-text mb-4">برای مشاهده اخبار، لطفاً ابتدا وارد حساب کاربری خود شوید.</p>
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">ورود به حساب</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

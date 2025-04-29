@@ -1,4 +1,4 @@
-from news import app,API_LOGIN_URL,API_NEWS_URL,API_SIGNUP_URL,forms
+from news import app,API_LOGIN_URL,API_NEWS_URL,API_SIGNUP_URL,forms,API_LOGOUT_URL
 
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
 import requests
@@ -10,26 +10,28 @@ from news.forms import SignupForm, LoginForm, AddNewsForm
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if request.cookies["access_token"] is None:
+        rec = requests.post(API_SIGNUP_URL, json={
+            "access_token": request.cookies["access_token"]
+        })
+        if rec.status_code == 200:
+            return redirect(url_for('index',username = rec.json()["username"]))
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
         remember = form.remember.data
         if username == 'admin' and password == 'admin':
             return redirect(url_for('admin'))
-
         response = requests.post(API_LOGIN_URL, json={
             'username': username,
             'password': password
         })
-
+        if remember:
+            session.permanent = True  # فعال‌سازی ماندگاری سشن
         if response.status_code == 200:
             data = response.json()
-            session['username'] = username
-            session['role'] = data.get('role', 'user')  # فرض: API نقش کاربر رو برمی‌گردونه
-
-            if remember:
-                session.permanent = True  # فعال‌سازی ماندگاری سشن
-            return redirect(url_for('home'))
+            res =redirect(url_for('index',username = username))
+            res.set_cookie('access_token', data['access_token'],expires=timedelta(minutes=30))
         else:
             flash('نام کاربری یا رمز اشتباه است', 'danger')
 
@@ -65,38 +67,18 @@ news_data =[]
 def home():
     if request.cookies.get('username'):
         print(request.cookies)
-        global news_data
-    # response = requests.get(API_NEWS_URL)
-    #
-    # if response.status_code == 200:
-    #     news_data = response.json()  # فرض می‌کنیم اخبار به این شکل برگشت می‌خوره
-    # else:
-    #     news_data = []
-    # return render_template('index.html', news=news_data)
-        news_data = [
-        {
-            "id": 1,
-            "title": "خبر شماره 1",
-            "summary": "خلاصه‌ای از خبر شماره 1...",
-            "image_url": "https://via.placeholder.com/150",
-            "body": "به نام خدا علیرضا روح الهی هستم 32 کا بانتی زدم !!"
-        },
-        {
-            "id": 2,
-            "title": "خبر شماره 2",
-            "summary": "خلاصه‌ای از خبر شماره 2...",
-            "image_url": "https://via.placeholder.com/150",
-            "body": "به نام خدا علیرضا روح الهی هستم 32 کا بانتی زدم !!"
-        }
-    ]
-        return render_template('index.html', news=news_data)
+       #todo:page login nakarde
+        return "error"
 
     else:
-        print(request.cookies)
-        response = make_response("cookie set!!")
-        response.set_cookie("username", "admin",10)
-        response.set_cookie("TOKEN", "jkdukahdklhkadhihasjlih",10)
-        return response
+         response = requests.post(API_SIGNUP_URL, json={
+            "access_token":request.cookies["access_token"]})
+         if response.status_code == 200:
+             news_data = response.json()  # فرض می‌کنیم اخبار به این شکل برگشت می‌خوره
+         else:
+             news_data = []
+         RENDER =  render_template('index.html', news=news_data)
+         return RENDER
 
 
 def get_news_by_id(id):
@@ -112,7 +94,8 @@ def news_detail(id):
 
 @app.route('/logout')
 def logout():
-    session.clear()
+    response = make_response()
+    response.delete_cookie('access_token')
     return redirect(url_for('login'))
 @app.route('/admin')
 def admin():
@@ -127,6 +110,16 @@ def add_news():
     summary =form.summary.data
     body = form.body.data
     if form.validate_on_submit():
-
+        # todo: functionality
         pass
     return render_template('admin_add_news.html',form = form)
+
+
+
+
+
+
+
+
+
+

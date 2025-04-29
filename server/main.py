@@ -1,3 +1,5 @@
+from http.client import responses
+
 from fastapi import FastAPI, Depends, HTTPException, status, Form, Response, Request
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,7 @@ from fastapi.responses import JSONResponse
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 
 # اجازه دادن به درخواست از همه جا برای تست
 app.add_middleware(
@@ -25,9 +28,9 @@ def get_db():
         yield db
     finally:
         db.close()
-
-def get_current_user(request: Request, db: Session = Depends(get_db)):
-    token = request.cookies.get("access_token")
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    body = await request.json()
+    token = body.get("access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing")
     payload = auth.decode_access_token(token)
@@ -40,6 +43,27 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
 @app.get("/user")
 def read_root():
     return {"message": "User created successfully"}
+@app.post("/verify-token")
+async def verify_token(request: Request, db: Session = Depends(get_db)):
+    try:
+        body = await request.json()
+        token = body.get("access_token")
+        if not token:
+            raise HTTPException(status_code=401, detail="Token is missing")
+
+        payload = auth.decode_access_token(token)
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        user = crud.get_user_by_username(db, payload.get("sub"))
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+
+        return {"username": user.username, "role": user.rule, "message": "Token is valid"}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.post("/signup")
 async def signup(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     existing_user = crud.get_user_by_username(db, user_data.username)
@@ -65,12 +89,11 @@ async def login_for_access_token(response: Response, username: str = Form(...), 
     access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
 
-    response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=auth.ACCESS_TOKEN_EXPIRE_MINUTES*60)
-    return {"message": "Login successful"}
+    return {"access_token":access_token}
 
 @app.post("/logout")
 async def logout(response: Response):
-    response.delete_cookie("access_token")
+    #response.delete_cookie("access_token")
     return {"message": "Logged out"}
 
 @app.post("/news")
