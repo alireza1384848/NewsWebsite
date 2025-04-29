@@ -127,6 +127,6 @@ def add_news():
     summary =form.summary.data
     body = form.body.data
     if form.validate_on_submit():
-    #TODO : add news functionality should impelemet
+
         pass
     return render_template('admin_add_news.html',form = form)

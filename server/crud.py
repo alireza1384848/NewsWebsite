@@ -24,3 +24,5 @@ def get_news_by_id(db: Session, news_id: int):
 def delete_news(db: Session, news: models.News):
     db.delete(news)
     db.commit()
+def get_all_news(db: Session):
+    return db.query(models.News).all()

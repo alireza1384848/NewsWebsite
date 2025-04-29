@@ -37,7 +37,9 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
-
+@app.get("/user")
+def read_root():
+    return {"message": "User created successfully"}
 @app.post("/signup")
 async def signup(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     existing_user = crud.get_user_by_username(db, user_data.username)
@@ -85,7 +87,7 @@ async def create_news(news: schemas.NewsCreate, db: Session = Depends(get_db), c
     crud.create_news(db, db_news)
     return {"message": "News created successfully"}
 
-@app.get("/news", response_model=list[schemas.NewsOut])
+@app.get("/news", response_model=list[schemas.NewsCreate])
 async def get_all_news(db: Session = Depends(get_db)):
     news_list = crud.get_all_news(db)
     return news_list
@@ -99,3 +101,9 @@ async def delete_news(news_id: int, db: Session = Depends(get_db), current_user:
         raise HTTPException(status_code=403, detail="Not authorized to delete this news")
     crud.delete_news(db, news)
     return {"message": "News deleted successfully"}
+
+
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
