@@ -3,52 +3,58 @@
 {% block title %}ثبت‌نام{% endblock %}
 
 {% block content %}
-   <style>
-    body {
-      background: linear-gradient(to left, #e0eafc, #cfdef3);
-      min-height: 100vh;
-        display: flex;
-      justify-content: center;
-      align-items: center;
+<style>
+  body {
+    background: linear-gradient(to left, #e0eafc, #cfdef3);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
 
-    }
-    </style>
- <div class="login-card">
-    <h4 class="text-center mb-4 text-primary">ثبت‌نام حساب کاربری</h4>
-      <form method="POST" class="form-register">
-            {{ form.hidden_tag() }}
+<div class="login-card">
+  <h4 class="text-center mb-4 text-primary">ثبت‌نام حساب کاربری</h4>
 
-         <div class="mb-3">
+  <form method="POST" class="form-register">
+    {{ form.hidden_tag() }}
 
-             {{ form.username.label(class="form-label") }}
-            {{ form.username(class="form-control", id="username", placeholder="نام") }}
-        </div>
-         <div class="mb-3">
-        <label for="National_key" class="form-label" style="color: black">کدملی</label>
-        {{ form.national_key(class="form-control", id="nathonal_key", placeholder="*********") }}
-      </div>
-      <div class="mb-3">
-        <label for="email" class="form-label" style="color: black">ایمیل</label>
-        {{ form.email(class="form-control", id="email", placeholder="example@gmail.com") }}
-      </div>
+    <div class="mb-3">
+      {{ form.username.label(class="form-label") }}
+      {{ form.username(class="form-control", id="username", placeholder="نام") }}
+    </div>
 
-      <div class="mb-3">
-        <label for="password" class="form-label">رمز عبور</label>
-        {{ form.password(class="form-control", id="password", placeholder="*********") }}
-      </div>
+    <div class="mb-3">
+      <label for="National_key" class="form-label" style="color: black">کدملی</label>
+      {{ form.national_key(class="form-control", id="nathonal_key", placeholder="*********") }}
+    </div>
 
-      <div class="mb-3">
-        <label for="confirm_password" class="form-label">تایید رمز عبور</label>
-        {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="*********") }}
-      </div>
+    <div class="mb-3">
+      <label for="email" class="form-label" style="color: black">ایمیل</label>
+      {{ form.email(class="form-control", id="email", placeholder="example@gmail.com") }}
+    </div>
 
-      <div class="mb-3">
-        {{ form.remember() }}
-        <label for="remember" class="form-check-label">مرا به خاطر بسپار</label>
-      </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">رمز عبور</label>
+      {{ form.password(class="form-control", id="password", placeholder="*********") }}
+    </div>
 
-      {{ form.submit(class="form-control btn btn-lg btn-block btn-primary") }} <!-- Updated submit button -->
+    <div class="mb-3">
+      <label for="confirm_password" class="form-label">تایید رمز عبور</label>
+      {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="*********") }}
+    </div>
 
-      </form>
+    <div class="mb-3">
+      {{ form.remember() }}
+      <label for="remember" class="form-check-label">مرا به خاطر بسپار</label>
+    </div>
+
+    {{ form.submit(class="form-control btn btn-lg btn-block btn-primary") }}
+  </form>
+
+  <div class="text-center mt-3">
+    <span>قبلاً ثبت‌نام کرده‌اید؟</span>
+    <a href="{{ url_for('login') }}" class="text-decoration-none text-primary fw-bold">وارد شوید</a>
   </div>
+</div>
 {% endblock %}

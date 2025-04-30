@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}ثبت‌نام موفق{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+  <div class="alert alert-success shadow-sm" role="alert">
+    <h4 class="alert-heading">تبریک!</h4>
+    <p>ثبت‌نام شما با موفقیت انجام شد.</p>
+    <hr>
+    <a href="{{ url_for('login') }}" class="btn btn-primary mt-3">ورود به حساب کاربری</a>
+  </div>
+</div>
+{% endblock %}
+2

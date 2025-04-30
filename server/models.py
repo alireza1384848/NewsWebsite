@@ -4,8 +4,7 @@ from database import Base
 class User(Base):
     __tablename__ = "users"
     username = Column(String(255), primary_key=True, unique=True, index=True)
-    name = Column(String)
-    family = Column(String)
+    email = Column(String)
     password = Column(String)
     rule = Column(String)
 

@@ -28,9 +28,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
 async def get_current_user(request: Request, db: Session = Depends(get_db)):
-    body = await request.json()
-    token = body.get("access_token")
+    token = request.headers.get("Authorization")
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing")
     payload = auth.decode_access_token(token)
@@ -72,8 +72,7 @@ async def signup(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = auth.get_password_hash(user_data.password)
     user = models.User(
         username=user_data.username,
-        name=user_data.name,
-        family=user_data.family,
+        email=user_data.email,
         password=hashed_password,
         rule=user_data.rule
     )
@@ -89,13 +88,15 @@ async def login_for_access_token(response: Response, username: str = Form(...), 
     access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
 
-    return {"access_token":access_token}
+    return {"access_token":access_token,"token_type": "bearer"}
 
 @app.post("/logout")
 async def logout(response: Response):
     #response.delete_cookie("access_token")
     return {"message": "Logged out"}
-
+@app.get("/me")
+def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
+    return {"username": current_user.username, "rule": current_user.rule}
 @app.post("/news")
 async def create_news(news: schemas.NewsCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     from datetime import datetime
@@ -110,11 +111,20 @@ async def create_news(news: schemas.NewsCreate, db: Session = Depends(get_db), c
     crud.create_news(db, db_news)
     return {"message": "News created successfully"}
 
-@app.get("/news", response_model=list[schemas.NewsCreate])
-async def get_all_news(db: Session = Depends(get_db)):
-    news_list = crud.get_all_news(db)
-    return news_list
-
+@app.get("/news")
+async def get_all_news(request:Request, db: Session = Depends(get_db)):
+    try:
+        auth.get_current_user(request)
+        news_list = crud.get_all_news(db)
+        return news_list
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+@app.get("/news/{news_id}", response_model=list[schemas.NewsOut])
+def get_single_news(news_id: int, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    news = db.query(models.News).filter(models.News.news_id == news_id).first()
+    if not news:
+        raise HTTPException(status_code=404, detail="News not found")
+    return news
 @app.delete("/news/{news_id}")
 async def delete_news(news_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     news = crud.get_news_by_id(db, news_id)
