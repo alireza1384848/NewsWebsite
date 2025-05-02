@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}تأیید حذف{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+  <div class="bg-white p-5 shadow-sm rounded text-center">
+    <h4 class="mb-4 text-danger">⚠️ آیا از حذف این خبر مطمئن هستید؟</h4>
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      {{ form.confirm(class="btn btn-danger me-2") }}
+      {{ form.cancel(class="btn btn-secondary") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

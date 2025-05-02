@@ -18,14 +18,6 @@
         {% endfor %}
       </div>
 
-      <!-- نویسنده -->
-      <div class="mb-3">
-        {{ form.author.label(class="form-label") }}
-        {{ form.author(class="form-control", placeholder="نام نویسنده را وارد کنید") }}
-        {% for error in form.author.errors %}
-          <div class="text-danger">{{ error }}</div>
-        {% endfor %}
-      </div>
        <!-- خلاصه -->
       <div class="mb-3">
         {{ form.summary.label(class="form-label") }}

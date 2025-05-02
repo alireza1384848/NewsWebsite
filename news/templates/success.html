@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}موفقیت{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+  <div class="text-center bg-white p-5 rounded shadow-sm">
+    <h2 class="text-success mb-4">✅ خبر با موفقیت اضافه شد</h2>
+    <a href="{{ url_for('admin') }}" class="btn btn-primary">بازگشت به صفحه ادمین</a>
+  </div>
+</div>
+{% endblock %}

@@ -3,55 +3,54 @@
 {% block title %}صفحه اصلی{% endblock %}
 
 {% block content %}
-  <div class="container mt-4">
+<div class="container mt-4">
+  {% if username %}
+    <h5 class="text-center text-success mb-4">
+      {{ username }} عزیز، خوش آمدید 🌟
+    </h5>
+  {% endif %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">سایت خبری</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        {% if auth %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">خروج</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">ورود</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signup')}}">ثبت‌نام</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
 
-    {% if username %}
-      <h5 class="text-center text-success mb-4">
-        {{ username }} عزیز، خوش آمدید 🌟
-      </h5>
-    {% endif %}
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">سایت خبری</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            {% if 'username' not in session %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('login') }}">ورود</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('signup')}}">ثبت‌نام</a>
-              </li>
-            {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('logout') }}">خروج</a>
-              </li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
 
-    <h2 class="mb-4 text-center text-primary">آخرین اخبار</h2>
+  <h2 class="mb-4 text-center text-primary">آخرین اخبار</h2>
 
-    <div class="row">
-      {% for news_item in news %}
-        <div class="col-md-4 mb-4">
-          <div class="card shadow-sm">
-            <img src="{{ news_item['image_url'] }}" class="card-img-top" alt="{{ news_item['title'] }}">
-            <div class="card-body">
-              <h5 class="card-title">{{ news_item['title'] }}</h5>
-              <p class="card-text">{{ news_item['summary'] }}</p>
-              <a href="{{ url_for('news_detail', id=news_item.id) }}" class="btn btn-primary">بیشتر بخوانید</a>
-            </div>
+  <div class="row">
+    {% for news_item in news %}
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+          <img src="{{ news_item['image_url'] }}" class="card-img-top" alt="{{ news_item['title'] }}">
+          <div class="card-body">
+            <h5 class="card-title">{{ news_item['title'] }}</h5>
+            <p class="card-text">{{ news_item['summary'] }}</p>
+            <a href="{{ url_for('news_detail', id=news_item.news_id) }}" class="btn btn-primary">بیشتر بخوانید</a>
           </div>
         </div>
-      {% endfor %}
-    </div>
-
+      </div>
+    {% endfor %}
   </div>
+</div>
 {% endblock %}

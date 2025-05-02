@@ -35,7 +35,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing")
     payload = auth.decode_access_token(token)
     if payload is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token!")
     user = crud.get_user_by_username(db, payload.get("sub"))
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
@@ -80,20 +80,17 @@ async def signup(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     return {"message": "User created successfully"}
 
 @app.post("/token")
-async def login_for_access_token(response: Response, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def login_for_access_token(response: Response, username: str = Form(...), password: str = Form(...),exp_time: int = Form(...), db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, username)
     if not user or not auth.verify_password(password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=exp_time)
     access_token = auth.create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
 
-    return {"access_token":access_token,"token_type": "bearer"}
+    return {"access_token":access_token,"token_type": "bearer", "role" : user.rule}
 
-@app.post("/logout")
-async def logout(response: Response):
-    #response.delete_cookie("access_token")
-    return {"message": "Logged out"}
+
 @app.get("/me")
 def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
     return {"username": current_user.username, "rule": current_user.rule}
@@ -106,7 +103,7 @@ async def create_news(news: schemas.NewsCreate, db: Session = Depends(get_db), c
         summary=news.summary,
         image_url=news.image_url,
         author=current_user.username,
-        date=datetime.utcnow().isoformat()
+        date = news.date
     )
     crud.create_news(db, db_news)
     return {"message": "News created successfully"}
@@ -119,7 +116,7 @@ async def get_all_news(request:Request, db: Session = Depends(get_db)):
         return news_list
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-@app.get("/news/{news_id}", response_model=list[schemas.NewsOut])
+@app.get("/news/{news_id}")
 def get_single_news(news_id: int, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     news = db.query(models.News).filter(models.News.news_id == news_id).first()
     if not news:
@@ -130,8 +127,6 @@ async def delete_news(news_id: int, db: Session = Depends(get_db), current_user:
     news = crud.get_news_by_id(db, news_id)
     if not news:
         raise HTTPException(status_code=404, detail="News not found")
-    if news.author != current_user.username:
-        raise HTTPException(status_code=403, detail="Not authorized to delete this news")
     crud.delete_news(db, news)
     return {"message": "News deleted successfully"}
 

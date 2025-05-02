@@ -7,9 +7,13 @@
     <div class="card p-4 shadow-lg" style="background-color: #ffffffb3;">
         <h2 class="mb-4 text-center">داشبورد مدیریت</h2>
 
-        <!-- دکمه افزودن خبر -->
-        <div class="mb-4 text-center">
-            <a href="{{ url_for("add_news")  }}" class="btn btn-success">افزودن خبر جدید</a>
+        <!-- دکمه‌های هم‌تراز -->
+        <div class="mb-4 d-flex justify-content-center">
+            <!-- دکمه افزودن خبر -->
+            <a href="{{ url_for('add_news') }}" class="btn btn-success me-2">افزودن خبر جدید</a>
+
+            <!-- دکمه خروج -->
+            <a href="{{ url_for('logout') }}" class="btn btn-warning">خروج</a>
         </div>
 
         <!-- لیست خبرها -->
@@ -28,14 +32,28 @@
             <tbody>
                 {% for news_item in news_list %}
                 <tr>
-                    <td>{{ news_item.id }}</td>
+                    <td>{{ news_item.news_id }}</td>
                     <td>{{ news_item.title }}</td>
                     <td>{{ news_item.author }}</td>
                     <td>{{ news_item.date }}</td>
                     <td>
-                        <form method="POST" action="#" onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید این خبر را حذف کنید؟');">
-                            <button type="submit" class="btn btn-danger btn-sm">حذف</button>
-                        </form>
+                        <a href="{{ url_for('delete_news', id=news_item.news_id) }}"
+                           class="btn btn-danger btn-sm"
+                           onclick="event.preventDefault();
+                                    if (confirm('آیا مطمئن هستید که می‌خواهید این خبر را حذف کنید؟')) {
+                                        var form = document.createElement('form');
+                                        form.method = 'POST';
+                                        form.action = '{{ url_for('delete_news', id=news_item.news_id) }}';
+                                        var csrf_token = document.createElement('input');
+                                        csrf_token.type = 'hidden';
+                                        csrf_token.name = 'csrf_token';
+                                        csrf_token.value = '{{ csrf_token() }}';
+                                        form.appendChild(csrf_token);
+                                        document.body.appendChild(form);
+                                        form.submit();
+                                    }">
+                            حذف
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}
