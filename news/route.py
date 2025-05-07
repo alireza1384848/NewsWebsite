@@ -6,6 +6,10 @@ from datetime import timedelta,datetime
 
 from news.forms import SignupForm, LoginForm, AddNewsForm,Confirmform
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return render_template("ratelimit.html", error=e.description), 429
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
